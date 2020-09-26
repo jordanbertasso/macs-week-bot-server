@@ -17,7 +17,7 @@ app.get("/image/:random.png", (req, res) => {
 
     ctx.font = "30px Roboto";
     ctx.fillStyle = "white";
-	ctx.fillText(String(moment().format("W") - 30), 11, 30);
+	ctx.fillText(String(moment().format("W") - 32), 11, 30);
     // ctx.fillText("∞", 0, 30);
     console.log(moment().format());
 
