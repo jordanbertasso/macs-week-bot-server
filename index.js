@@ -2,7 +2,7 @@ const moment = require("moment");
 const { createCanvas, loadImage } = require("canvas");
 const express = require("express");
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 8080;
 
 let random = "";
 
@@ -12,12 +12,12 @@ app.get("/week.png", (req, res) => {
 });
 
 app.get("/image/:random.png", (req, res) => {
-    const canvas = createCanvas(40, 40);
+    const canvas = createCanvas(50, 50);
     const ctx = canvas.getContext("2d");
 
-    ctx.font = "30px Roboto";
+    ctx.font = "34px Roboto";
     ctx.fillStyle = "white";
-	ctx.fillText(String(moment().format("W") - 32), 11, 30);
+	ctx.fillText(String(moment().format("W") - 32), 5, 35);
     // ctx.fillText("∞", 0, 30);
     console.log(moment().format());
 
