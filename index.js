@@ -14,12 +14,11 @@ app.get("/week.png", (req, res) => {
 app.get("/image/:random.png", (req, res) => {
     const canvas = createCanvas(50, 50);
     const ctx = canvas.getContext("2d");
-	const week = l.DateTime.local().setZone("Australia/Sydney").minus({weeks: 32}).plus({days: 2}).toFormat("W");
+    const week = l.DateTime.local().setZone("Australia/Sydney").minus({weeks: 32}).plus({days: 2}).toFormat("W");
 
     ctx.font = "34px Roboto";
     ctx.fillStyle = "white";
-	ctx.fillText(week, 5, 35);
-    // ctx.fillText("∞", 0, 30);
+    ctx.fillText(week, 5, 35);
     console.log(week);
 
     res.set("Cache-Control", "no-store");
@@ -28,6 +27,6 @@ app.get("/image/:random.png", (req, res) => {
 });
 
 app.listen(port, "0.0.0.0", () =>
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`listening on http://localhost:${port}`)
 );
 
