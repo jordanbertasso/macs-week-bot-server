@@ -15,11 +15,17 @@ app.get("/image/:random.png", (req, res) => {
     const canvas = createCanvas(50, 50);
     const ctx = canvas.getContext("2d");
     const week = l.DateTime.local().setZone("Australia/Sydney").minus({weeks: 32}).plus({days: 2}).toFormat("W");
+    console.log(week);
+
 
     ctx.font = "34px Roboto";
     ctx.fillStyle = "white";
-    ctx.fillText(week, 5, 35);
-    console.log(week);
+
+	if (Number(week) < 13) {
+		ctx.fillText(week, 5, 35);
+	} else {
+		ctx.fillText("no", 5, 35);
+	}
 
     res.set("Cache-Control", "no-store");
     res.set("Expires", "0");
