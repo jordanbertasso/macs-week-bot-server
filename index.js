@@ -15,7 +15,7 @@ app.get("/image/:random.png", (req, res) => {
     const canvas = createCanvas(50, 50);
     const ctx = canvas.getContext("2d");
 
-    const sem_start = l.DateTime.local(2021, 2, 22).setZone("Australia/Sydney");
+    const sem_start = l.DateTime.local(2021, 2, 20).setZone("Australia/Sydney");
     const now = l.DateTime.local().setZone("Australia/Sydney")
     const sem_millis = now.diff(sem_start).milliseconds;
     const week = Math.ceil(sem_millis / (7 * 24 * 60 * 60 * 1000)).toString();
