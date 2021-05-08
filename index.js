@@ -28,7 +28,11 @@ app.get("/image/:random.png", (req, res) => {
     ctx.fillStyle = "white";
 
     if (Number(week) < 13) {
-        ctx.fillText(week, 15, 35);
+		if (Number(week) >= 10) {
+			ctx.fillText(week, 5, 35);
+		} else {
+			ctx.fillText(week, 15, 35);
+		}
     } else {
         ctx.fillText("no", 5, 35);
     }
