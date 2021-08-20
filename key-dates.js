@@ -1,6 +1,6 @@
 const xpath = require('xpath')
-  , dom = require('xmldom').DOMParser
-  , fetch = require('node-fetch');
+    , dom = require('xmldom').DOMParser
+    , fetch = require('node-fetch');
 
 const l = require("luxon");
 
@@ -14,30 +14,30 @@ async function getMqImportantDates() {
     return important_dates;
 }
 
-async function getParsedDates () {
+async function getParsedDates() {
     var importantDates = await getMqImportantDates();
 
-    var sessionStarts = importantDates.filter((e) => e.date_name == "Study Period Start" && e.location == "North Ryde" && e.parent_calendar == "Macquarie University" && e.study_period.includes("Session")).map(e => ({"date": l.DateTime.local(parseInt((split = e.date.split('/'))[2]), parseInt(split[1]), parseInt(split[0])).setZone("Australia/Sydney"), "year": split[2], "session": /Session ([1-3])/.exec(e.study_period)[1]}));
+    var sessionStarts = importantDates.filter((e) => e.date_name == "Study Period Start" && e.location == "North Ryde" && e.parent_calendar == "Macquarie University" && e.study_period.includes("Session")).map(e => ({ "date": l.DateTime.local(parseInt((split = e.date.split('/'))[2]), parseInt(split[1]), parseInt(split[0])).setZone("Australia/Sydney"), "year": split[2], "session": /Session ([1-3])/.exec(e.study_period)[1] }));
 
     return sessionStarts;
 }
 
 async function getCurrentSem(date) {
-  var data = await getParsedDates();
+    var data = await getParsedDates();
 
-  for (var i = 1; i < data.length; i++) {
-    if (date <= data[i].date) {
-      return data[i-1];
+    for (var i = 1; i < data.length; i++) {
+        if (date <= data[i].date) {
+            return data[i - 1];
+        }
     }
-  }
-  
-  return null;
+
+    return null;
 }
 
 
 
 module.exports = {
-  getCurrentSem: getCurrentSem,
-  getParsedDates: getParsedDates,
-  getMqImportantDates: getMqImportantDates
+    getCurrentSem: getCurrentSem,
+    getParsedDates: getParsedDates,
+    getMqImportantDates: getMqImportantDates
 };
