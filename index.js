@@ -48,7 +48,7 @@ app.get("/image/:random.png", async (req, res) => {
             ctx.fillText("no", 5, 35);
         }
     } else
-        ctx.fillText("re", 5, 35);
+        ctx.fillText("no", 5, 35);
 
     res.set("Cache-Control", "no-store");
     res.set("Expires", "0");
