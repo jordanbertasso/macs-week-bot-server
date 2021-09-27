@@ -4,40 +4,66 @@ const xpath = require('xpath')
 
 const l = require("luxon");
 
-// x is your XQuery executor, for browsers this is '$x'
-async function getMqImportantDates() {
-    var rawData = await fetch("https://www.mq.edu.au/study/calendar-of-dates").then((d) => d.text());
-    var htmlData = (new dom()).parseFromString(rawData, 'text/html');
-    var select = xpath.useNamespaces({ h: 'http://www.w3.org/1999/xhtml' });
+const waitEval = (ev) => {
+    return new Promise((resolve, reject) => {
+        eval(ev);
+    });
+};
 
-    eval(select("//h:section[(contains(@class, 'main-content'))]/h:script[1]/text()", htmlData)[0].textContent);
-    return important_dates;
-}
+class KeyDates
+{
+    data;
 
-async function getParsedDates() {
-    var importantDates = await getMqImportantDates();
+    async getMqImportantDates() {
+        if (KeyDates.data == null) {
+            var rawData = await fetch("https://www.mq.edu.au/study/calendar-of-dates").then((d) => d.text());
+            var htmlData = (new dom()).parseFromString(rawData, 'text/html');
+            var select = xpath.useNamespaces({ h: 'http://www.w3.org/1999/xhtml' });
 
-    var sessionStarts = importantDates.filter((e) => e.date_name == "Study Period Start" && e.location == "North Ryde" && e.parent_calendar == "Macquarie University" && e.study_period.includes("Session")).map(e => ({ "date": l.DateTime.local(parseInt((split = e.date.split('/'))[2]), parseInt(split[1]), parseInt(split[0])).setZone("Australia/Sydney"), "year": split[2], "session": /Session ([1-3])/.exec(e.study_period)[1] }));
-
-    return sessionStarts;
-}
-
-async function getCurrentSem(date) {
-    var data = await getParsedDates();
-
-    for (var i = 1; i < data.length; i++) {
-        if (date <= data[i].date) {
-            return data[i - 1];
+            var mqDataJs = select("//h:section[(contains(@class, 'main-content'))]/h:script[1]/text()", htmlData)[0].textContent + "; resolve(important_dates);";
+            
+            var important_dates = await waitEval(mqDataJs);
+            
+            KeyDates.data = important_dates.filter((e) => e.location == "North Ryde" && e.parent_calendar == "Macquarie University");
         }
+
+        return KeyDates.data;
     }
 
-    return null;
+    async getSemesterStarts() {
+        var importantDates = await this.getMqImportantDates();
+
+        var split;
+        var sessionStarts = importantDates.filter((e) => e.date_name == "Study Period Start" && e.study_period.includes("Session")).map(e => ({ "date": l.DateTime.local(parseInt((split = e.date.split('/'))[2]), parseInt(split[1]), parseInt(split[0])).setZone("Australia/Sydney"), "year": split[2], "session": /Session ([1-3])/.exec(e.study_period)[1] }));
+
+        return sessionStarts;
+    }
+
+    async getDateFromSem(date_name, semester, year) {
+        var rec = (await this.getMqImportantDates())
+            .filter((e) => e.date_name == date_name && /Session ([1-3])/.exec(e.study_period)[1] == semester && e.date.split('/')[2] == year);
+
+        if (rec == [])
+            return false;
+
+        var split = rec[0].date.split('/');
+
+        return l.DateTime.local(parseInt(split[2]), parseInt(split[1]), parseInt(split[0]));
+    }
+
+    async getCurrentSem(date) {
+        var data = await this.getSemesterStarts();
+
+        for (var i = 1; i < data.length; i++) {
+            if (date <= data[i].date) {
+                return data[i - 1];
+            }
+        }
+
+        return null;
+    }
 }
 
-
-
 module.exports = {
-    getCurrentSem: getCurrentSem,
-    getParsedDates: getParsedDates,
-    getMqImportantDates: getMqImportantDates
+    KeyDates: KeyDates
 };
