@@ -26,6 +26,7 @@ const getWeekNum = async (keyDates) => {
 
     return { week: Math.ceil(sem_millis / (7 * 24 * 60 * 60 * 1000) - ((now > recess_end) ? 2 : 0)), is_break: (now > recess_start && now < recess_end) };
 }
+
 class KeyDates
 {
     data;
