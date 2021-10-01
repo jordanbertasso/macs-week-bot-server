@@ -39,13 +39,10 @@ class KeyDates
 
                 this.checkStale(file);
             } catch (e) {
-                console.log(e);
                 let newDates = await this.getMqImportantDatesFromInternet();
                 this.writeDatesToFile(newDates);
                 this.data = newDates;
             }
-
-            console.log(file?.stale);
         }
 
         return this.data;
@@ -59,10 +56,7 @@ class KeyDates
             let newKeyDates = new KeyDates();
             newKeyDates.data = newDates;
 
-            console.log(await newKeyDates.getMqImportantDates());
-
             const newWeek = (await getWeekNum(newKeyDates)).week;
-            console.log(newWeek);
 
             if (newWeek > 0) {
                 this.writeDatesToFile(newDates);
