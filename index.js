@@ -1,6 +1,6 @@
 const l = require("luxon");
 const { createCanvas, loadImage } = require("canvas");
-const KeyDates = require('./key-dates').KeyDates;
+const { KeyDates, getWeekNum } = require('./key-dates');
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 8080;
@@ -20,35 +20,31 @@ app.get("/image/:random.png", async (req, res) => {
 
     const keyDates = new KeyDates();
 
-    const now = l.DateTime.local().setZone("Australia/Sydney");
-    const sem = await keyDates.getCurrentSem(now);
-    const sem_start = sem.date;
+    const data = await getWeekNum(keyDates);
 
-    const recess_start = await keyDates.getDateFromSem("Recess Start", sem.session, sem.year);
-    const recess_end = await keyDates.getDateFromSem("Recess End", sem.session, sem.year);
-    
-    // const second_half = sem.session == '2';
-    const is_break = (now > recess_start && now < recess_end);
-
-    // const sem_start = l.DateTime.local(2021, 2,  20).setZone("Australia/Sydney");
-    const sem_millis = now.diff(sem_start).milliseconds;
-    const week = Math.ceil(sem_millis / (7 * 24 * 60 * 60 * 1000) - ((now > recess_end) ? 2 : 0)).toString();
+    const week = data.week.toString();
+    const is_break = data.is_break;
 
     ctx.font = "34px Roboto";
     ctx.fillStyle = "white";
 
-    if (!is_break) {
-        if (Number(week) < 13) {
-            if (Number(week) >= 10) {
-                ctx.fillText(week, 5, 35);
+    if (Number(week) > 0) {
+        if (!is_break) {
+            if (Number(week) < 13) {
+                if (Number(week) >= 10) {
+                    ctx.fillText(week, 5, 35);
+                } else {
+                    ctx.fillText(week, 15, 35);
+                }
             } else {
-                ctx.fillText(week, 15, 35);
+                ctx.fillText("no", 5, 35);
             }
-        } else {
+        } else
             ctx.fillText("no", 5, 35);
-        }
-    } else
+    } else {
         ctx.fillText("no", 5, 35);
+        console.error("Error in loading dates.");
+    }
 
     res.set("Cache-Control", "no-store");
     res.set("Expires", "0");
